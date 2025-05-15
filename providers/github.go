@@ -507,6 +507,7 @@ func (p *GitHubProvider) getOrgs(ctx context.Context, s *sessions.SessionState) 
 func (p *GitHubProvider) getTeams(ctx context.Context, s *sessions.SessionState) error {
 	// https://docs.github.com/en/rest/teams/teams?#list-user-teams
 	type Team struct {
+		Id int `json:"id"`
 		Name string `json:"name"`
 		Slug string `json:"slug"`
 		Org  struct {
@@ -538,8 +539,9 @@ func (p *GitHubProvider) getTeams(ctx context.Context, s *sessions.SessionState)
 		}
 
 		for _, team := range teams {
-			logger.Printf("Member of Github Organization/Team:%q/%q", team.Org.Login, team.Slug)
+			logger.Printf("Member of Github Organization/Team: %q/%q (id: %d)", team.Org.Login, team.Slug, team.Id)
 			s.Groups = append(s.Groups, team.Org.Login+orgTeamSeparator+team.Slug)
+			s.Groups = append(s.Groups, "group"+orgTeamSeparator+strconv.Itoa(team.Id))
 		}
 
 		pn++
